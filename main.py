@@ -1,5 +1,4 @@
 import sys
-
 import numpy as np
 
 P = [0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89, 0x452821e6,
@@ -8,22 +7,26 @@ P = [0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0, 0x0
 key = "0xaabb09182736ccdd"
 
 
-def getSbox(sboxArray, src):
+def uploadSbox(sboxArray, src):
     try:
-        file = open(src, "rb")
+        file = open(src, "r")
     except:
         print("Can't find such file (wrong path)")
     else:
+        number = 0
         row = 0
         while True:
-            byte = file.read(1)
-            file.seek(1, 1)
-            if not byte:
+            hexaString = file.read(8)
+            if not hexaString:
                 break
-
-            sboxArray[row] = int.from_bytes(byte, byteorder=sys.byteorder)
+            file.read(2)    
+            number += 1 
+            if number == 8:
+                file.read(1)
+                number = 0
+            sboxArray[row] = int(hexaString, base=16)
             row += 1
-        file.close()
+    file.close()
 
 
 def divide_hexadecimal(hex_num):
@@ -64,8 +67,8 @@ def decryptImage(sbox):
 def main():
     # https://www.geeksforgeeks.org/blowfish-algorithm-with-examples/
     # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
-    sboxArray = np.zeros(256, dtype=int)
-    getSbox(sboxArray, '.\s-blocks\sbox_08x08_20130117_030729__Original.SBX')
+    sboxArray = np.zeros(256, dtype=float)
+    uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit\sbox1.txt')
     # print(sboxArray)
     encryptImage(sboxArray)
     decryptImage(sboxArray)
