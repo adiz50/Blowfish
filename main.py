@@ -68,6 +68,15 @@ def addMod32(a, b):
 
 # def functionF(value32):
 
+def encryptionRound(value, i, subkeys):
+    i = i % len(subkeys)
+    firstpart, secondpart = value[:len(value) // 2], value[len(value) // 2:]
+    a = int(firstpart, 2)
+    b = int(secondpart, 2)
+    aNew = subkeys[i] ^ a
+    b = subkeys[i] #^ int(F(format( aNew, '08b')),2)
+    return format(b, '08b') + format(a, '08b')
+
 
 def encryptImage(sbox):
     subkeys = generateP()
