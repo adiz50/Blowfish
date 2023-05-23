@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 
@@ -8,25 +9,33 @@ key = "0xaabb09182736ccdd"
 
 
 def uploadSbox(sboxArray, src):
-    try:
-        file = open(src, "r")
-    except:
-        print("Can't find such file (wrong path)")
-    else:
-        number = 0
-        row = 0
-        while True:
-            hexaString = file.read(8)
-            if not hexaString:
-                break
-            file.read(2)    
-            number += 1 
-            if number == 8:
-                file.read(1)
+    counter = 0
+    for fileName in os.listdir(src):
+        if fileName.endswith(".txt"):
+            file_path = f"{src}\{fileName}"
+            file = open(file_path, "r")
+            try:
+                file = open(file_path, "r")
+            except:
+                print("Can't find such file (wrong path)")
+                return
+            else:
                 number = 0
-            sboxArray[row] = int(hexaString, base=16)
-            row += 1
-    file.close()
+                row = 0
+                while True:
+                    hexaString = file.read(8)
+                    if not hexaString:
+                        break
+                    file.read(2)    
+                    number += 1 
+                    if number == 8:
+                        file.read(1)
+                        number = 0
+                    sboxArray[row] = int(hexaString, base=16)
+                    row += 1
+            counter += 1
+            file.close()
+    return sboxArray
 
 
 def divide_hexadecimal(hex_num):
@@ -53,11 +62,11 @@ def generateP():
             j += 1
     return Pnew
 
+
 def addMod32(a, b):
     return (a + b) % 32
 
 # def functionF(value32):
-
 
 
 def encryptImage(sbox):
@@ -72,9 +81,8 @@ def decryptImage(sbox):
 def main():
     # https://www.geeksforgeeks.org/blowfish-algorithm-with-examples/
     # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
-    sboxArray = np.zeros(256, dtype=float)
-    uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit\sbox1.txt')
-    # print(sboxArray)
+    sboxArray = np.zeros((256, 4), dtype=float)
+    sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
     encryptImage(sboxArray)
     decryptImage(sboxArray)
 
