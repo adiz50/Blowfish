@@ -94,18 +94,20 @@ def encryptionRound(value, i, subkeys):
     firstpart, secondpart = value[:len(value) // 2], value[len(value) // 2:]
     a = int(firstpart, 2)
     b = int(secondpart, 2)
-    aNew = int(subkeys[i], 16) ^ a
-    b = int(subkeys[i], 16) ^ int(functionF(format(aNew, '032b')), 2)
+    # print(subkeys)
+    aNew = int(subkeys[i]) ^ a
+    b = int(subkeys[i]) ^ int(functionF(format(aNew, '032b')), 2)
     return format(b, '032b') + format(a, '032b')
 
 def postProcessing(roundsOutput, subkeys):
-    x_left = int(roundsOutput[0:32], 2) ^ subkeys[1]
-    x_right = int(roundsOutput[32:], 2) ^ subkeys[0]
-    return x_right + x_left
+    x_left = int(roundsOutput[0:32], 2) ^ int(subkeys[1])
+    x_right = int(roundsOutput[32:], 2) ^ int(subkeys[0])
+    return format(x_right, '032b') + format(x_left, '032b')
 
 def encryptImage(data):
     subkeys = generateP()
     data = into64bit(data)
+    # print(data)
     for x in data:
         for i in range(16):
             x = encryptionRound(x, i, subkeys)
@@ -124,7 +126,7 @@ def main():
     #sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
     data = "abcdef12345"
     b = encryptImage(data)
-
+    print(b)
     decryptImage()
 
 
