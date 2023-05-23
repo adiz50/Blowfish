@@ -5,6 +5,8 @@ import numpy as np
 P = [0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89, 0x452821e6,
      0x38d01377, 0xbe5466cf, 0x34e90c6c, 0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917, 0x9216d5d9, 0x8979fb1b]
 
+key = "0xaabb09182736ccdd"
+
 
 def getSbox(sboxArray, src):
     try:
@@ -24,20 +26,34 @@ def getSbox(sboxArray, src):
         file.close()
 
 
-def cipherUsingP(data):
-    data = np.array(data)
-    encrypted = np.empty(data.shape, dtype=data.dtype)
-    i = 0
-    for (x, j) in enumerate(data):
-        encrypted[j] = P[i]^data[j]
-        if i == len(P)-1:
-            i = 0
+def divide_hexadecimal(hex_num):
+    hex_num = hex_num.strip("0x")  # Remove '0x' prefix if present
+    hex_num = hex_num.zfill(8)  # Pad with leading zeros if necessary
+
+    parts = []
+    for i in range(0, 8, 2):
+        part = hex_num[i:i + 2]
+        parts.append(int(part, 16))  # Convert part to integer using base 16
+
+    return parts
+
+
+def generateP():
+    Pnew = np.empty(shape=18)
+    key_parts = divide_hexadecimal(key)
+    j = 0
+    for (i, x) in enumerate(P):
+        Pnew[i] = x ^ key_parts[j]
+        if j == len(key_parts) - 1:
+            j = 0
         else:
-            i += 1
-    return encrypted
+            j += 1
+    return Pnew
 
 
 def encryptImage(sbox):
+    P = generateP()
+    print(P)
     return
 
 
