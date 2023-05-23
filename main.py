@@ -26,8 +26,8 @@ def uploadSbox(sboxArray, src):
                     hexaString = file.read(8)
                     if not hexaString:
                         break
-                    file.read(2)    
-                    number += 1 
+                    file.read(2)
+                    number += 1
                     if number == 8:
                         file.read(1)
                         number = 0
@@ -64,9 +64,19 @@ def generateP():
 
 
 def addMod32(a, b):
-    return (a + b) % 32
+    return (a + b) % (2**32)
 
-# def functionF(value32):
+
+def functionF(value32):
+    sboxArray = np.zeros((256, 4), dtype=float)
+    sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
+    value322 = '01010111001100011111001011010010'
+    block8bits = [value322[i: i + 8] for i in range(0, len(value322), 8)]
+    sboxVals = [sboxArray[int(block8bits[i], 2), i] for i in range(4)]
+    add1 = addMod32(sboxVals[0], sboxVals[1])
+    xor1 = int(add1) ^ int(sboxVals[2])
+    addFinal = addMod32(xor1, int(sboxVals[3]))
+    return format(addFinal, '032b')
 
 
 def encryptImage(sbox):
@@ -85,6 +95,7 @@ def main():
     sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
     encryptImage(sboxArray)
     decryptImage(sboxArray)
+    functionF(3)
 
 
 if __name__ == '__main__':
