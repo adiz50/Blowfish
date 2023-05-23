@@ -24,8 +24,20 @@ def getSbox(sboxArray, src):
         file.close()
 
 
-def encryptImage(sbox):
+def cipherUsingP(data):
+    data = np.array(data)
+    encrypted = np.empty(data.shape, dtype=data.dtype)
+    i = 0
+    for (x, j) in enumerate(data):
+        encrypted[j] = P[i]^data[j]
+        if i == len(P)-1:
+            i = 0
+        else:
+            i += 1
+    return encrypted
 
+
+def encryptImage(sbox):
     return
 
 
