@@ -88,6 +88,11 @@ def into64bit(M):
 
     return [''.join(format((ord(o)), '08b') for o in i) for i in words]
 
+def bitsToStr(B):
+    wordsBits = [B[i:i+8] for i in range(0, len(B), 8)]
+    print(wordsBits)
+    words = [chr(int(i, 2)) for i in wordsBits]
+    return ''.join(words)
 
 def encryptionRound(value, i, subkeys):
     i = i % len(subkeys)
@@ -100,7 +105,7 @@ def encryptionRound(value, i, subkeys):
     return format(b, '032b') + format(a, '032b')
 
 def postProcessing(roundsOutput, subkeys):
-    x_left = int(roundsOutput[0:32], 2) ^ int(subkeys[1])
+    x_left = int(roundsOutput[:32], 2) ^ int(subkeys[1])
     x_right = int(roundsOutput[32:], 2) ^ int(subkeys[0])
     return format(x_right, '032b') + format(x_left, '032b')
 
@@ -127,6 +132,9 @@ def main():
     data = "abcdef12345"
     b = encryptImage(data)
     print(b)
+    b = ''.join(b)
+    print(b)
+    print(bitsToStr(b))
     decryptImage()
 
 
