@@ -70,13 +70,13 @@ def addMod32(a, b):
 def functionF(value32):
     sboxArray = np.zeros((256, 4), dtype=float)
     sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
-    value322 = '01010111001100011111001011010010'
-    block8bits = [value322[i: i + 8] for i in range(0, len(value322), 8)]
+    block8bits = [value32[i: i + 8] for i in range(0, len(value32), 8)]
     sboxVals = [sboxArray[int(block8bits[i], 2), i] for i in range(4)]
     add1 = addMod32(sboxVals[0], sboxVals[1])
     xor1 = int(add1) ^ int(sboxVals[2])
     addFinal = addMod32(xor1, int(sboxVals[3]))
     return format(addFinal, '032b')
+
 
 def encryptionRound(value, i, subkeys):
     i = i % len(subkeys)
@@ -84,8 +84,8 @@ def encryptionRound(value, i, subkeys):
     a = int(firstpart, 2)
     b = int(secondpart, 2)
     aNew = subkeys[i] ^ a
-    b = subkeys[i] #^ int(F(format( aNew, '08b')),2)
-    return format(b, '08b') + format(a, '08b')
+    b = subkeys[i] ^ int(functionF(format(aNew, '032b')), 2)
+    return format(b, '032b') + format(a, '032b')
 
 
 def encryptImage(sbox):
