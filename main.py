@@ -79,13 +79,10 @@ def functionF(value32):
 
 def into64bit(M):
     num = len(M) // 8
-
     if len(M) % 8 != 0:  # pad with 0's
         num += 1
         M += '0' * (8 - len(M) % 8)
-
     words = [M[i*8: (i+1) * 8] for i in range(num)]
-
     return [''.join(format((ord(o)), '08b') for o in i) for i in words]
 
 def bitsToStr(B):
@@ -113,11 +110,13 @@ def encryptImage(data):
     subkeys = generateP()
     data = into64bit(data)
     # print(data)
+    result = []
     for x in data:
         for i in range(16):
             x = encryptionRound(x, i, subkeys)
             x = postProcessing(x, subkeys)
-    return data
+        result.append(x)
+    return result
 
 
 def decryptImage():
@@ -129,12 +128,13 @@ def main():
     # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
     #sboxArray = np.zeros((256, 4), dtype=float)
     #sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
-    data = "abcdef12345"
+    data = "dataabcd"
     b = encryptImage(data)
     print(b)
-    b = ''.join(b)
-    print(b)
-    print(bitsToStr(b))
+    res = ''.join(b)
+    print(res)
+    print(len(res))
+    print(bitsToStr(res))
     decryptImage()
 
 
