@@ -53,10 +53,15 @@ def generateP():
             j += 1
     return Pnew
 
+def addMod32(a, b):
+    return (a + b) % 32
+
+# def functionF(value32):
+
+
 
 def encryptImage(sbox):
-    P = generateP()
-    print(P)
+    subkeys = generateP()
     return
 
 
