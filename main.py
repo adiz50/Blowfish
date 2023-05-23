@@ -77,34 +77,55 @@ def functionF(value32):
     addFinal = addMod32(xor1, int(sboxVals[3]))
     return format(addFinal, '032b')
 
+def into64bit(M):
+    num = len(M) // 8
+
+    if len(M) % 8 != 0:  # pad with 0's
+        num += 1
+        M += '0' * (8 - len(M) % 8)
+
+    words = [M[i*8: (i+1) * 8] for i in range(num)]
+
+    return [''.join(format((ord(o)), '08b') for o in i) for i in words]
+
 
 def encryptionRound(value, i, subkeys):
     i = i % len(subkeys)
     firstpart, secondpart = value[:len(value) // 2], value[len(value) // 2:]
     a = int(firstpart, 2)
     b = int(secondpart, 2)
-    aNew = subkeys[i] ^ a
-    b = subkeys[i] ^ int(functionF(format(aNew, '032b')), 2)
+    aNew = int(subkeys[i], 16) ^ a
+    b = int(subkeys[i], 16) ^ int(functionF(format(aNew, '032b')), 2)
     return format(b, '032b') + format(a, '032b')
 
+def postProcessing(roundsOutput, subkeys):
+    x_left = int(roundsOutput[0:32], 2) ^ subkeys[1]
+    x_right = int(roundsOutput[32:], 2) ^ subkeys[0]
+    return x_right + x_left
 
-def encryptImage(sbox):
+def encryptImage(data):
     subkeys = generateP()
-    return
+    data = into64bit(data)
+    for x in data:
+        for i in range(16):
+            x = encryptionRound(x, i, subkeys)
+            x = postProcessing(x, subkeys)
+    return data
 
 
-def decryptImage(sbox):
+def decryptImage():
     return
 
 
 def main():
     # https://www.geeksforgeeks.org/blowfish-algorithm-with-examples/
     # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
-    sboxArray = np.zeros((256, 4), dtype=float)
-    sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
-    encryptImage(sboxArray)
-    decryptImage(sboxArray)
-    functionF(3)
+    #sboxArray = np.zeros((256, 4), dtype=float)
+    #sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
+    data = "abcdef12345"
+    b = encryptImage(data)
+
+    decryptImage()
 
 
 if __name__ == '__main__':
