@@ -8,10 +8,4 @@ def into64bit(M):
     words = [M[i*8: (i+1) * 8] for i in range(num)]
     wordsBit = []
 
-    return [''.join(bin(ord(o))[2:] for o in i) for i in words]
-    
-
-x = into64bit('43hellotherehowareyo434u')
-for i in x:
-    print(len(i))
-
+    return [''.join(format((ord(o)), '08b') for o in i) for i in words]
