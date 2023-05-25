@@ -102,10 +102,28 @@ def postProcessing(roundsOutput, subkeys):
     x_right = int(roundsOutput[32:], 2) ^ int(subkeys[0])
     return format(x_right, '032b') + format(x_left, '032b')
 
-def encryptImage(data):
+def preProcessing(roundsOutput, subkeys):
+    x_left = int(roundsOutput[:32], 2) ^ int(subkeys[17])
+    x_right = int(roundsOutput[32:], 2) ^ int(subkeys[16])
+    return format(x_right, '032b') + format(x_left, '032b')
+
+def encrypt(data):
     subkeys = generateP()
     data = into64bit(data)
     # print(data)
+    result = []
+    for x in data:
+        for i in range(16):
+            x = encryptionRound(x, i, subkeys)
+        x = preProcessing(x, subkeys)
+        result.append(x)
+    return result
+
+
+def decrypt(data):
+    subkeys = generateP()
+    subkeys = np.flip(subkeys)
+    data = into64bit(data)
     result = []
     for x in data:
         for i in range(16):
@@ -115,23 +133,21 @@ def encryptImage(data):
     return result
 
 
-def decryptImage():
-    return
-
-
 def main():
     # https://www.geeksforgeeks.org/blowfish-algorithm-with-examples/
     # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
     #sboxArray = np.zeros((256, 4), dtype=float)
     #sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
     data = "dataabcd"
-    b = encryptImage(data)
-    print(b)
-    res = ''.join(b)
-    print(res)
-    print(len(res))
-    print(bitsToStr(res))
-    decryptImage()
+    print(data)
+    encrypted = bitsToStr(''.join(encrypt(data)))
+    print(encrypted)
+    decrypted = bitsToStr(''.join(decrypt(encrypted)))
+    print(decrypted)
+    #c = decryptImage(bitsToStr(res))
+    #decrypted = ''.join(c)
+    #print(bitsToStr(decrypted))
+
 
 
 if __name__ == '__main__':
