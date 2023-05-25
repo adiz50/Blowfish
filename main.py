@@ -69,16 +69,15 @@ def functionF(value32):
     return format(addFinal, '032b')
 
 def into64bit(M):
-    num = len(M) // 8
+    num = (len(M)) // 8
     if len(M) % 8 != 0:  # pad with 0's
         num += 1
-        M += '0' * (8 - len(M) % 8)
-    words = [M[i*8: (i+1) * 8] for i in range(num)]
+        M += '\0' * (8 - len(M) % 8)
+    words = [M[i*8: (i*8) + 8] for i in range(num)]
     return [''.join(format((ord(o)), '08b') for o in i) for i in words]
 
 def bitsToStr(B):
     wordsBits = [B[i:i+8] for i in range(0, len(B), 8)]
-    print(wordsBits)
     words = [chr(int(i, 2)) for i in wordsBits]
     return ''.join(words)
 
@@ -105,7 +104,7 @@ def preProcessing(roundsOutput, subkeys):
 def encrypt(data):
     subkeys = generateP()
     data = into64bit(data)
-    # print(data)
+    # print([data[0][i:8+i] for i in range(0, len(data[0]), 8)])
     result = []
     for x in data:
         for i in range(16):
@@ -133,7 +132,7 @@ def main():
     # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
     #sboxArray = np.zeros((256, 4), dtype=float)
     #sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
-    data = "dataabcd"
+    data = "dataabcd3"
     print(data)
     encrypted = bitsToStr(''.join(encrypt(data)))
     print(encrypted)
