@@ -55,11 +55,7 @@ def generateP():
     key_parts = divide_hexadecimal(key)
     j = 0
     for (i, x) in enumerate(P):
-        Pnew[i] = x ^ key_parts[j]
-        if j == len(key_parts) - 1:
-            j = 0
-        else:
-            j += 1
+        Pnew[i] = x ^ key_parts[j%18]
     return Pnew
 
 
