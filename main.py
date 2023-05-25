@@ -16,7 +16,7 @@ def uploadSbox(sboxArray, src):
             file = open(file_path, "r")
             try:
                 file = open(file_path, "r")
-            except:
+            except Exception:
                 print("Can't find such file (wrong path)")
                 return
             else:
@@ -42,12 +42,7 @@ def divide_hexadecimal(hex_num):
     hex_num = hex_num.strip("0x")  # Remove '0x' prefix if present
     hex_num = hex_num.zfill(8)  # Pad with leading zeros if necessary
 
-    parts = []
-    for i in range(0, 8, 2):
-        part = hex_num[i:i + 2]
-        parts.append(int(part, 16))  # Convert part to integer using base 16
-
-    return parts
+    return [int(hex_num[i:i + 2], 16) for i in range(0, 8, 2)]
 
 
 def generateP():
@@ -93,18 +88,18 @@ def encryptionRound(value, i, subkeys):
     L = int(firstpart, 2)
     R = int(secondpart, 2)
     # print(subkeys)
-    aNew = int(subkeys[i]) ^ L
-    R = R ^ int(functionF(format(aNew, '032b')), 2)
-    return format(R, '032b') + format(L, '032b')
+    L ^= int(subkeys[i])
+    R ^= int(functionF(format(L, '032b')), 2)
+    return  format(R, '032b') + format(L, '032b')
 
 def postProcessing(roundsOutput, subkeys):
-    x_left = int(roundsOutput[:32], 2) ^ int(subkeys[1])
-    x_right = int(roundsOutput[32:], 2) ^ int(subkeys[0])
+    x_left = int(roundsOutput[:32], 2) ^ int(subkeys[16])
+    x_right = int(roundsOutput[32:], 2) ^ int(subkeys[17])
     return format(x_right, '032b') + format(x_left, '032b')
 
 def preProcessing(roundsOutput, subkeys):
-    x_left = int(roundsOutput[:32], 2) ^ int(subkeys[17])
-    x_right = int(roundsOutput[32:], 2) ^ int(subkeys[16])
+    x_left = int(roundsOutput[:32], 2) ^ int(subkeys[1])
+    x_right = int(roundsOutput[32:], 2) ^ int(subkeys[0])
     return format(x_right, '032b') + format(x_left, '032b')
 
 def encrypt(data):
@@ -115,20 +110,20 @@ def encrypt(data):
     for x in data:
         for i in range(16):
             x = encryptionRound(x, i, subkeys)
-        x = preProcessing(x, subkeys)
+        x = postProcessing(x, subkeys)
         result.append(x)
     return result
 
 
 def decrypt(data):
     subkeys = generateP()
-    subkeys = np.flip(subkeys)
+    # subkeys = np.flip(subkeys)
     data = into64bit(data)
     result = []
     for x in data:
-        for i in range(16):
+        for i in range(17, 1, -1):
             x = encryptionRound(x, i, subkeys)
-        x = postProcessing(x, subkeys)
+        x = preProcessing(x, subkeys)
         result.append(x)
     return result
 
