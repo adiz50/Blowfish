@@ -110,7 +110,7 @@ def encryptImage(data):
     for x in data:
         for i in range(16):
             x = encryptionRound(x, i, subkeys)
-            x = postProcessing(x, subkeys)
+        x = postProcessing(x, subkeys)
         result.append(x)
     return result
 
