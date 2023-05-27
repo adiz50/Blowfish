@@ -1,5 +1,5 @@
 import os
-import sys
+import base64
 import numpy as np
 
 P = [0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0, 0x082efa98, 0xec4e6c89, 0x452821e6,
@@ -126,21 +126,21 @@ def decrypt(data):
         result.append(x)
     return result
 
+def inputPostProcessing(data):
+    return data.replace('\0', '')
 
 def main():
     # https://www.geeksforgeeks.org/blowfish-algorithm-with-examples/
     # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
     #sboxArray = np.zeros((256, 4), dtype=float)
     #sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
-    data = "dataabcd3"
+    data = "bigdataprojekt3242904jg0g92kkegdofg::efefef"
     print(data)
     encrypted = bitsToStr(''.join(encrypt(data)))
-    print(encrypted)
+    encryptedBase64 = base64.b64encode(encrypted.encode('utf-8')).decode('utf-8')
+    print(encryptedBase64)
     decrypted = bitsToStr(''.join(decrypt(encrypted)))
-    print(decrypted)
-    #c = decryptImage(bitsToStr(res))
-    #decrypted = ''.join(c)
-    #print(bitsToStr(decrypted))
+    print(inputPostProcessing(decrypted))
 
 
 
