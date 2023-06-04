@@ -50,7 +50,7 @@ def generateP():
     key_parts = divide_hexadecimal(key)
     j = 0
     for (i, x) in enumerate(P):
-        Pnew[i] = x ^ key_parts[j%18]
+        Pnew[i] = x ^ key_parts[j % 18]
     return Pnew
 
 
@@ -68,6 +68,7 @@ def functionF(value32):
     addFinal = addMod32(xor1, int(sboxVals[3]))
     return format(addFinal, '032b')
 
+
 def into64bit(M):
     num = (len(M)) // 8
     if len(M) % 8 != 0:  # pad with 0's
@@ -76,35 +77,38 @@ def into64bit(M):
     words = [M[i*8: (i*8) + 8] for i in range(num)]
     return [''.join(format((ord(o)), '08b') for o in i) for i in words]
 
+
 def bitsToStr(B):
     wordsBits = [B[i:i+8] for i in range(0, len(B), 8)]
     words = [chr(int(i, 2)) for i in wordsBits]
     return ''.join(words)
+
 
 def encryptionRound(value, i, subkeys):
     i = i % len(subkeys)
     firstpart, secondpart = value[:len(value) // 2], value[len(value) // 2:]
     L = int(firstpart, 2)
     R = int(secondpart, 2)
-    # print(subkeys)
     L ^= int(subkeys[i])
     R ^= int(functionF(format(L, '032b')), 2)
-    return  format(R, '032b') + format(L, '032b')
+    return format(R, '032b') + format(L, '032b')
+
 
 def postProcessing(roundsOutput, subkeys):
     x_left = int(roundsOutput[:32], 2) ^ int(subkeys[16])
     x_right = int(roundsOutput[32:], 2) ^ int(subkeys[17])
     return format(x_right, '032b') + format(x_left, '032b')
 
+
 def preProcessing(roundsOutput, subkeys):
     x_left = int(roundsOutput[:32], 2) ^ int(subkeys[1])
     x_right = int(roundsOutput[32:], 2) ^ int(subkeys[0])
     return format(x_right, '032b') + format(x_left, '032b')
 
+
 def encrypt(data):
     subkeys = generateP()
     data = into64bit(data)
-    # print([data[0][i:8+i] for i in range(0, len(data[0]), 8)])
     result = []
     for x in data:
         for i in range(16):
@@ -116,7 +120,6 @@ def encrypt(data):
 
 def decrypt(data):
     subkeys = generateP()
-    # subkeys = np.flip(subkeys)
     data = into64bit(data)
     result = []
     for x in data:
@@ -126,22 +129,19 @@ def decrypt(data):
         result.append(x)
     return result
 
+
 def inputPostProcessing(data):
     return data.replace('\0', '')
 
-def main():
-    # https://www.geeksforgeeks.org/blowfish-algorithm-with-examples/
-    # https://www.tutorialspoint.com/how-are-subkeys-generated-in-blowfish-algorithm
-    #sboxArray = np.zeros((256, 4), dtype=float)
-    #sboxArray = uploadSbox(sboxArray, '.\s-blocks\sbox256x32bit')
-    data = "bigdataprojekt3242904jg0g92kkegdofg::efefef"
-    print(data)
-    encrypted = bitsToStr(''.join(encrypt(data)))
-    encryptedBase64 = base64.b64encode(encrypted.encode('utf-8')).decode('utf-8')
-    print(encryptedBase64)
-    decrypted = bitsToStr(''.join(decrypt(encrypted)))
-    print(inputPostProcessing(decrypted))
 
+def main():
+    data = input("Insert input string: ")
+    encrypted = bitsToStr(''.join(encrypt(data)))
+    encryptedBase64 = base64.b64encode(
+        encrypted.encode('utf-8')).decode('utf-8')
+    print("Encrypted string: ", encryptedBase64)
+    decrypted = bitsToStr(''.join(decrypt(encrypted)))
+    print("Decrypted string: ", inputPostProcessing(decrypted))
 
 
 if __name__ == '__main__':
